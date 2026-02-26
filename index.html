@@ -23,7 +23,7 @@
     // (1) 시트 열기 버튼
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1FJN1gAqM4pHN8l8uUdhQfAgVg4lPONioNF8CFaV2Fak/edit?usp=sharing";
     document.getElementById("openSheet").addEventListener("click", () => {
-      window.location.href = SHEET_URL;
+      window.open(SHEET_URL, "_blank");
     });
 
     // (2) call/sms 리다이렉트
