@@ -3,25 +3,48 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Call</title>
+  <title>Call/SMS</title>
 </head>
 <body>
-  <p id="msg">전화 앱으로 이동 중…</p>
-  <p><a id="fallback" href="#">전화가 안 열리면 여기를 탭</a></p>
+  <p id="msg">이동 중…</p>
+  <p><a id="fallback" href="#">안 되면 여기를 탭</a></p>
 
   <script>
     const params = new URLSearchParams(location.search);
-    const raw = params.get("n") || "";
-    const n = raw.replace(/[^0-9+]/g, "");
+
+    // n=전화번호 (010-xxxx-xxxx든 뭐든 OK)
+    const rawN = params.get("n") || "";
+    const n = rawN.replace(/[^0-9+]/g, "");
+
+    // t=call | sms (기본 call)
+    const t = (params.get("t") || "call").toLowerCase();
+
+    // body=문자 내용 (선택)
+    const body = params.get("body") || "";
+
+    const msgEl = document.getElementById("msg");
+    const linkEl = document.getElementById("fallback");
 
     if (!n) {
-      document.getElementById("msg").textContent = "번호가 없습니다. (?n=01012345678)";
+      msgEl.textContent = "번호가 없습니다. (?n=01012345678&t=call 또는 sms)";
     } else {
-      const tel = "tel:" + n;
-      document.getElementById("fallback").href = tel;
-      document.getElementById("msg").textContent = `전화 걸기: ${n}`;
+      let uri = "";
+
+      if (t === "sms") {
+        // iOS/Android 호환 위해 body 포함 형태를 최대한 안전하게
+        const encBody = encodeURIComponent(body);
+        // 일부 환경에선 sms:010...?body= 가 동작
+        // 안 되면 fallback 링크를 눌러도 되게 해둠
+        uri = body ? `sms:${n}?body=${encBody}` : `sms:${n}`;
+        msgEl.textContent = body ? `문자 보내기: ${n}` : `문자 작성: ${n}`;
+      } else {
+        uri = `tel:${n}`;
+        msgEl.textContent = `전화 걸기: ${n}`;
+      }
+
+      linkEl.href = uri;
       // 자동 시도
-      location.href = tel;
+      location.href = uri;
     }
   </script>
 </body>
