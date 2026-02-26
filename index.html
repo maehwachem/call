@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Call</title>
+</head>
+<body>
+  <p id="msg">전화 앱으로 이동 중…</p>
+  <p><a id="fallback" href="#">전화가 안 열리면 여기를 탭</a></p>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const raw = params.get("n") || "";
+    const n = raw.replace(/[^0-9+]/g, "");
+
+    if (!n) {
+      document.getElementById("msg").textContent = "번호가 없습니다. (?n=01012345678)";
+    } else {
+      const tel = "tel:" + n;
+      document.getElementById("fallback").href = tel;
+      document.getElementById("msg").textContent = `전화 걸기: ${n}`;
+      // 자동 시도
+      location.href = tel;
+    }
+  </script>
+</body>
+</html>
