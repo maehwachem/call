@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Call/SMS</title>
+  <title>출결 연락 도구</title>
 
   <link rel="manifest" href="/call/manifest.webmanifest">
   <meta name="theme-color" content="#ffffff">
@@ -20,26 +20,28 @@
   <p><a id="fallback" href="#">안 되면 여기를 탭</a></p>
 
   <script>
-    // ✅ (1) 시트 열기 버튼
+    // (1) 시트 열기 버튼
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1FJN1gAqM4pHN8l8uUdhQfAgVg4lPONioNF8CFaV2Fak/edit?usp=sharing";
     document.getElementById("openSheet").addEventListener("click", () => {
       window.location.href = SHEET_URL;
     });
 
-    // ✅ (2) call/sms 리다이렉트
+    // (2) call/sms 리다이렉트
     const params = new URLSearchParams(location.search);
+    const isHome = params.get("home") === "1";
 
     const rawN = params.get("n") || "";
     const n = rawN.replace(/[^0-9+]/g, "");
+
     const t = (params.get("t") || "").toLowerCase(); // call | sms
     const body = params.get("body") || "";
 
     const msgEl = document.getElementById("msg");
     const linkEl = document.getElementById("fallback");
 
-    // n이 없으면: 홈 화면(버튼) 용도로 둠
-    if (!n) {
-      msgEl.textContent = "홈 화면입니다. (전화/문자 링크를 누르면 자동 실행됩니다.)";
+    // n이 없거나(home=1)면: 홈 화면 고정
+    if (!n || isHome) {
+      msgEl.textContent = "홈 화면입니다. 위의 📄 버튼으로 출결 시트를 열 수 있어요.";
     } else {
       let uri = "";
 
@@ -58,7 +60,7 @@
   </script>
 
   <script>
-    // ✅ (3) 서비스워커 등록은 body 안(맨 아래)이 안정적
+    // (3) 서비스워커 등록
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/call/sw.js");
     }
