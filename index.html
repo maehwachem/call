@@ -1,10 +1,19 @@
 <!doctype html>
 <html lang="ko">
 <head>
+  <link rel="manifest" href="/call/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Call/SMS</title>
 </head>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/call/sw.js");
+  }
+</script>
 <body>
   <p id="msg">이동 중…</p>
   <p><a id="fallback" href="#">안 되면 여기를 탭</a></p>
