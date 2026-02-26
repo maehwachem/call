@@ -15,6 +15,16 @@
   }
 </script>
 <body>
+   <button id="openSheet" style="font-size:18px;padding:12px 16px;">
+    📄 출결 시트 열기
+  </button>
+
+  <script>
+    const SHEET_URL = "여기에_구글시트_공유링크_붙여넣기";
+    document.getElementById("openSheet").addEventListener("click", () => {
+      window.location.href = SHEET_URL;
+    });
+  </script>
   <p id="msg">이동 중…</p>
   <p><a id="fallback" href="#">안 되면 여기를 탭</a></p>
 
