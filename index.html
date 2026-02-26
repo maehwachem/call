@@ -1,59 +1,50 @@
 <!doctype html>
 <html lang="ko">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Call/SMS</title>
+
   <link rel="manifest" href="/call/manifest.webmanifest">
   <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Call/SMS</title>
 </head>
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/call/sw.js");
-  }
-</script>
+
 <body>
-   <button id="openSheet" style="font-size:18px;padding:12px 16px;">
+  <button id="openSheet" style="font-size:18px;padding:12px 16px;">
     📄 출결 시트 열기
   </button>
 
-  <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1FJN1gAqM4pHN8l8uUdhQfAgVg4lPONioNF8CFaV2Fak/edit?usp=sharing";
-    document.getElementById("openSheet").addEventListener("click", () => {
-      window.location.href = SHEET_URL;
-    });
-  </script>
   <p id="msg">이동 중…</p>
   <p><a id="fallback" href="#">안 되면 여기를 탭</a></p>
 
   <script>
+    // ✅ (1) 시트 열기 버튼
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1FJN1gAqM4pHN8l8uUdhQfAgVg4lPONioNF8CFaV2Fak/edit?usp=sharing";
+    document.getElementById("openSheet").addEventListener("click", () => {
+      window.location.href = SHEET_URL;
+    });
+
+    // ✅ (2) call/sms 리다이렉트
     const params = new URLSearchParams(location.search);
 
-    // n=전화번호 (010-xxxx-xxxx든 뭐든 OK)
     const rawN = params.get("n") || "";
     const n = rawN.replace(/[^0-9+]/g, "");
-
-    // t=call | sms (기본 call)
-    const t = (params.get("t") || "call").toLowerCase();
-
-    // body=문자 내용 (선택)
+    const t = (params.get("t") || "").toLowerCase(); // call | sms
     const body = params.get("body") || "";
 
     const msgEl = document.getElementById("msg");
     const linkEl = document.getElementById("fallback");
 
+    // n이 없으면: 홈 화면(버튼) 용도로 둠
     if (!n) {
-      msgEl.textContent = "번호가 없습니다. (?n=01012345678&t=call 또는 sms)";
+      msgEl.textContent = "홈 화면입니다. (전화/문자 링크를 누르면 자동 실행됩니다.)";
     } else {
       let uri = "";
 
       if (t === "sms") {
-        // iOS/Android 호환 위해 body 포함 형태를 최대한 안전하게
         const encBody = encodeURIComponent(body);
-        // 일부 환경에선 sms:010...?body= 가 동작
-        // 안 되면 fallback 링크를 눌러도 되게 해둠
         uri = body ? `sms:${n}?body=${encBody}` : `sms:${n}`;
         msgEl.textContent = body ? `문자 보내기: ${n}` : `문자 작성: ${n}`;
       } else {
@@ -62,8 +53,14 @@
       }
 
       linkEl.href = uri;
-      // 자동 시도
-      location.href = uri;
+      location.href = uri; // 자동 실행
+    }
+  </script>
+
+  <script>
+    // ✅ (3) 서비스워커 등록은 body 안(맨 아래)이 안정적
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/call/sw.js");
     }
   </script>
 </body>
