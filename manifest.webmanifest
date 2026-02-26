@@ -1,7 +1,7 @@
 {
   "name": "출결 연락 도구",
   "short_name": "출결연락",
-  "start_url": "/call/",
+  "start_url": "/call/?home=1",
   "scope": "/call/",
   "display": "standalone",
   "background_color": "#ffffff",
